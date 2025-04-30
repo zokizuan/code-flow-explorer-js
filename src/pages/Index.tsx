@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Visualizer from '@/components/Visualizer';
 import codeExamples from '@/data/codeExamples';
 
 const Index = () => {
+  const [selectedExampleIndex, setSelectedExampleIndex] = useState(0);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -16,8 +18,26 @@ const Index = () => {
             See how JavaScript code runs step-by-step with visual explanations
           </p>
           
-          <div className="h-[calc(100vh-200px)]">
-            <Visualizer example={codeExamples[0]} className="h-full" />
+          <div className="mb-6">
+            <div className="flex justify-center space-x-4">
+              {codeExamples.map((example, index) => (
+                <button
+                  key={example.id}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    selectedExampleIndex === index 
+                      ? 'bg-primary text-white' 
+                      : 'bg-secondary hover:bg-secondary/80'
+                  }`}
+                  onClick={() => setSelectedExampleIndex(index)}
+                >
+                  {example.title}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="h-[calc(100vh-250px)]">
+            <Visualizer example={codeExamples[selectedExampleIndex]} className="h-full" />
           </div>
           
           <div className="mt-8 bg-secondary/30 rounded-lg p-6">

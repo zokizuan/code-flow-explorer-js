@@ -17,8 +17,52 @@ type ExecutionFlowProps = {
   className?: string;
 };
 
+// Define column categories to better organize the visualization
+const LAYOUT_COLUMNS = {
+  CALLSTACK: { x: 100, width: 150 },
+  EXECUTION_CONTEXTS: { x: 300, width: 200 },
+  SCOPES: { x: 550, width: 200 },
+  MEMORY: { x: 800, width: 250 }
+};
+
 const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
   const { fitView } = useReactFlow();
+
+  // Apply layout categorization to nodes
+  const organizedNodes = useMemo(() => {
+    // Don't modify nodes from examples directly, create a new array
+    return step.nodes.map(node => {
+      const newNode = { ...node };
+      
+      // Set positions based on node types for better categorization
+      if (node.type === 'stackFrameNode' && !node.parentNode && node.id.includes('call-stack')) {
+        newNode.position = { 
+          x: LAYOUT_COLUMNS.CALLSTACK.x, 
+          y: node.position.y 
+        };
+      } 
+      else if (node.type === 'executionContextNode') {
+        newNode.position = { 
+          x: LAYOUT_COLUMNS.EXECUTION_CONTEXTS.x, 
+          y: node.position.y 
+        };
+      }
+      else if (node.type === 'scopeNode' && !node.parentNode) {
+        newNode.position = { 
+          x: LAYOUT_COLUMNS.SCOPES.x, 
+          y: node.position.y
+        };
+      }
+      else if (node.type === 'heapObjectNode' && !node.parentNode) {
+        newNode.position = { 
+          x: LAYOUT_COLUMNS.MEMORY.x, 
+          y: node.position.y 
+        };
+      }
+      
+      return newNode;
+    });
+  }, [step.nodes]);
 
   // Use effect to fit view whenever the step changes
   React.useEffect(() => {
@@ -29,8 +73,17 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
 
   return (
     <div className={className}>
+      <div className="absolute top-2 left-2 right-2 bg-white/90 backdrop-blur-sm p-2 rounded-lg border shadow-sm z-10 flex justify-between">
+        <div className="text-xs font-medium">
+          <span className="bg-blue-100 px-2 py-1 rounded mr-2">Call Stack</span>
+          <span className="bg-purple-100 px-2 py-1 rounded mr-2">Execution Contexts</span>
+          <span className="bg-green-100 px-2 py-1 rounded mr-2">Scopes</span>
+          <span className="bg-amber-100 px-2 py-1 rounded">Memory Heap</span>
+        </div>
+      </div>
+      
       <ReactFlow
-        nodes={step.nodes}
+        nodes={organizedNodes}
         edges={step.edges}
         nodeTypes={nodeTypes}
         fitView

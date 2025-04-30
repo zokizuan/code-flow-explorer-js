@@ -63,7 +63,7 @@ export const FunctionNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
-      className="border-jsvis-purple bg-jsvis-lightPurple/20"
+      className="border-purple-400 bg-purple-50"
     />
   );
 };
@@ -72,7 +72,7 @@ export const VariableNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
-      className="border-jsvis-blue bg-jsvis-blue/10"
+      className="border-blue-400 bg-blue-50"
     />
   );
 };
@@ -81,11 +81,11 @@ export const ScopeNode: React.FC<BaseNodeProps> = (props) => {
   const { data } = props;
   const scopeType = data.type || 'global';
   
-  let className = "border-jsvis-yellow bg-jsvis-yellow/10";
+  let className = "border-green-400 bg-green-50";
   if (scopeType === 'function') {
-    className = "border-jsvis-green bg-jsvis-green/10";
+    className = "border-green-500 bg-green-50";
   } else if (scopeType === 'block') {
-    className = "border-jsvis-orange bg-jsvis-orange/10";
+    className = "border-teal-400 bg-teal-50";
   }
   
   return (
@@ -105,7 +105,7 @@ export const ExecutionContextNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
-      className="border-jsvis-purple bg-jsvis-lightPurple/20"
+      className="border-purple-500 bg-purple-100"
     />
   );
 };
@@ -114,7 +114,7 @@ export const StackFrameNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
-      className="border-jsvis-purple bg-jsvis-lightPurple/20"
+      className="border-blue-500 bg-blue-100"
     />
   );
 };
@@ -123,7 +123,7 @@ export const HeapObjectNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
-      className="border-jsvis-blue bg-jsvis-blue/20"
+      className="border-amber-400 bg-amber-50"
     />
   );
 };

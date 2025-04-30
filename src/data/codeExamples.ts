@@ -1,6 +1,709 @@
-
 import { CodeExample } from '@/types';
 import { MarkerType } from 'reactflow';
+
+// Closure function example
+const closureExample: CodeExample = {
+  id: 'closure-example',
+  title: 'Closures in JavaScript',
+  description: 'Understanding how closures capture and remember their lexical environment',
+  code: `function createCounter() {
+  let count = 0; // Declaration
+  return function() {
+    count = count + 1; // Assignment
+    return count;
+  };
+}
+const counter = createCounter();
+counter(); // First call, count becomes 1
+counter(); // Second call, count becomes 2`,
+  steps: [
+    {
+      id: 'step-1',
+      code: `function createCounter() {
+  let count = 0; // Declaration
+  return function() {
+    count = count + 1; // Assignment
+    return count;
+  };
+}`,
+      activeLine: 1,
+      description: 'Creating a function that will return another function (a closure)',
+      nodes: [
+        {
+          id: 'global-ec',
+          type: 'executionContextNode',
+          data: { label: 'Global Execution Context', highlighted: true },
+          position: { x: 200, y: 50 },
+        },
+        {
+          id: 'global-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Global Scope', 
+            type: 'global',
+            highlighted: true 
+          },
+          position: { x: 200, y: 150 },
+        },
+        {
+          id: 'memory-heap',
+          type: 'heapObjectNode',
+          data: { label: 'Memory Heap' },
+          position: { x: 500, y: 150 },
+        },
+        {
+          id: 'function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Function Object', 
+            value: 'createCounter',
+            highlighted: true
+          },
+          position: { x: 500, y: 250 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'createCounter',
+          type: 'functionNode',
+          data: { 
+            label: 'createCounter',
+            description: 'Function definition',
+            highlighted: true
+          },
+          position: { x: 200, y: 250 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+      ],
+      edges: [
+        {
+          id: 'function-to-def',
+          source: 'createCounter',
+          target: 'function-def',
+          animated: true,
+          markerEnd: { type: MarkerType.Arrow },
+        },
+      ],
+    },
+    {
+      id: 'step-2',
+      code: `const counter = createCounter();`,
+      activeLine: 7,
+      description: 'Calling createCounter() creates a new function with access to its own count variable',
+      nodes: [
+        {
+          id: 'call-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Call Stack', highlighted: true },
+          position: { x: 100, y: 50 },
+        },
+        {
+          id: 'global-ec-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Global EC' },
+          position: { x: 100, y: 150 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'createCounter-ec-stack',
+          type: 'stackFrameNode',
+          data: { 
+            label: 'createCounter EC',
+            highlighted: true 
+          },
+          position: { x: 100, y: 220 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'global-ec',
+          type: 'executionContextNode',
+          data: { label: 'Global Execution Context' },
+          position: { x: 250, y: 50 },
+        },
+        {
+          id: 'createCounter-ec',
+          type: 'executionContextNode',
+          data: { 
+            label: 'createCounter Execution Context',
+            highlighted: true 
+          },
+          position: { x: 450, y: 50 },
+        },
+        {
+          id: 'global-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Global Scope',
+            type: 'global'
+          },
+          position: { x: 250, y: 150 },
+        },
+        {
+          id: 'createCounter-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'createCounter Scope',
+            type: 'function',
+            highlighted: true 
+          },
+          position: { x: 450, y: 150 },
+        },
+        {
+          id: 'count-var',
+          type: 'variableNode',
+          data: { 
+            label: 'count', 
+            value: '0',
+            highlighted: true 
+          },
+          position: { x: 450, y: 250 },
+          parentNode: 'createCounter-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'createCounter',
+          type: 'functionNode',
+          data: { 
+            label: 'createCounter',
+            description: 'Function definition'
+          },
+          position: { x: 250, y: 250 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'memory-heap',
+          type: 'heapObjectNode',
+          data: { label: 'Memory Heap' },
+          position: { x: 650, y: 150 },
+        },
+        {
+          id: 'function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Function Object', 
+            value: 'createCounter'
+          },
+          position: { x: 650, y: 220 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'inner-function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Inner Function Object', 
+            value: 'anonymous',
+            highlighted: true
+          },
+          position: { x: 650, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+      ],
+      edges: [
+        {
+          id: 'function-to-def',
+          source: 'createCounter',
+          target: 'function-def',
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'inner-scope-link',
+          source: 'inner-function-def',
+          target: 'createCounter-scope',
+          style: { stroke: '#7E69AB', strokeWidth: 2, strokeDasharray: '5 5' },
+          markerEnd: { type: MarkerType.Arrow },
+          label: 'closure',
+          animated: true,
+        },
+      ],
+    },
+    {
+      id: 'step-3',
+      code: `const counter = createCounter();`,
+      activeLine: 7,
+      description: 'The counter variable now holds the inner function with its closure',
+      nodes: [
+        {
+          id: 'call-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Call Stack' },
+          position: { x: 100, y: 50 },
+        },
+        {
+          id: 'global-ec-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Global EC', highlighted: true },
+          position: { x: 100, y: 150 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'global-ec',
+          type: 'executionContextNode',
+          data: { label: 'Global Execution Context', highlighted: true },
+          position: { x: 250, y: 50 },
+        },
+        {
+          id: 'global-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Global Scope',
+            type: 'global',
+            highlighted: true
+          },
+          position: { x: 250, y: 150 },
+        },
+        {
+          id: 'createCounter',
+          type: 'functionNode',
+          data: { 
+            label: 'createCounter',
+            description: 'Function definition'
+          },
+          position: { x: 200, y: 250 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'counter-var',
+          type: 'variableNode',
+          data: { 
+            label: 'counter', 
+            value: 'function()',
+            highlighted: true
+          },
+          position: { x: 350, y: 250 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'memory-heap',
+          type: 'heapObjectNode',
+          data: { label: 'Memory Heap' },
+          position: { x: 550, y: 150 },
+        },
+        {
+          id: 'function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Function Object', 
+            value: 'createCounter'
+          },
+          position: { x: 500, y: 220 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'inner-function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Inner Function Object', 
+            value: 'anonymous',
+            highlighted: true
+          },
+          position: { x: 500, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'closure-env',
+          type: 'scopeNode',
+          data: { 
+            label: 'Closure Environment',
+            type: 'function',
+            highlighted: true
+          },
+          position: { x: 650, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'count-var-closure',
+          type: 'variableNode',
+          data: { 
+            label: 'count', 
+            value: '0',
+            highlighted: true
+          },
+          position: { x: 650, y: 380 },
+          parentNode: 'closure-env',
+          extent: 'parent',
+        },
+      ],
+      edges: [
+        {
+          id: 'function-to-def',
+          source: 'createCounter',
+          target: 'function-def',
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'counter-to-inner',
+          source: 'counter-var',
+          target: 'inner-function-def',
+          animated: true,
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'inner-to-closure',
+          source: 'inner-function-def',
+          target: 'closure-env',
+          animated: true,
+          style: { stroke: '#7E69AB', strokeWidth: 2 },
+          markerEnd: { type: MarkerType.Arrow },
+          label: 'closure',
+        },
+      ],
+    },
+    {
+      id: 'step-4',
+      code: `counter(); // First call, count becomes 1`,
+      activeLine: 8,
+      description: 'First call to counter() increments count to 1 using the closed-over variable',
+      nodes: [
+        {
+          id: 'call-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Call Stack', highlighted: true },
+          position: { x: 100, y: 50 },
+        },
+        {
+          id: 'global-ec-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Global EC' },
+          position: { x: 100, y: 120 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'counter-ec-stack',
+          type: 'stackFrameNode',
+          data: { 
+            label: 'Counter Function EC',
+            highlighted: true 
+          },
+          position: { x: 100, y: 180 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'global-ec',
+          type: 'executionContextNode',
+          data: { label: 'Global Execution Context' },
+          position: { x: 250, y: 50 },
+        },
+        {
+          id: 'counter-ec',
+          type: 'executionContextNode',
+          data: { 
+            label: 'Counter Function Execution Context',
+            highlighted: true 
+          },
+          position: { x: 450, y: 50 },
+        },
+        {
+          id: 'global-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Global Scope',
+            type: 'global'
+          },
+          position: { x: 250, y: 150 },
+        },
+        {
+          id: 'counter-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Counter Function Scope',
+            type: 'function',
+            highlighted: true 
+          },
+          position: { x: 450, y: 150 },
+        },
+        {
+          id: 'createCounter',
+          type: 'functionNode',
+          data: { 
+            label: 'createCounter',
+            description: 'Function definition'
+          },
+          position: { x: 200, y: 220 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'counter-var',
+          type: 'variableNode',
+          data: { 
+            label: 'counter', 
+            value: 'function()'
+          },
+          position: { x: 350, y: 220 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'memory-heap',
+          type: 'heapObjectNode',
+          data: { label: 'Memory Heap' },
+          position: { x: 650, y: 150 },
+        },
+        {
+          id: 'function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Function Object', 
+            value: 'createCounter'
+          },
+          position: { x: 600, y: 220 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'inner-function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Inner Function Object', 
+            value: 'anonymous'
+          },
+          position: { x: 600, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'closure-env',
+          type: 'scopeNode',
+          data: { 
+            label: 'Closure Environment',
+            type: 'function'
+          },
+          position: { x: 700, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'count-var-closure',
+          type: 'variableNode',
+          data: { 
+            label: 'count', 
+            value: '1',
+            highlighted: true
+          },
+          position: { x: 700, y: 380 },
+          parentNode: 'closure-env',
+          extent: 'parent',
+        },
+      ],
+      edges: [
+        {
+          id: 'function-to-def',
+          source: 'createCounter',
+          target: 'function-def',
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'counter-to-inner',
+          source: 'counter-var',
+          target: 'inner-function-def',
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'inner-to-closure',
+          source: 'inner-function-def',
+          target: 'closure-env',
+          style: { stroke: '#7E69AB', strokeWidth: 2 },
+          markerEnd: { type: MarkerType.Arrow },
+          label: 'closure',
+        },
+        {
+          id: 'counter-ec-to-closure',
+          source: 'counter-ec',
+          target: 'count-var-closure',
+          animated: true,
+          style: { stroke: '#9b87f5', strokeWidth: 2, strokeDasharray: '5 5' },
+          markerEnd: { type: MarkerType.Arrow },
+          label: 'access & update',
+        },
+      ],
+    },
+    {
+      id: 'step-5',
+      code: `counter(); // Second call, count becomes 2`,
+      activeLine: 9,
+      description: 'Second call to counter() increments the same closed-over count variable to 2',
+      nodes: [
+        {
+          id: 'call-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Call Stack', highlighted: true },
+          position: { x: 100, y: 50 },
+        },
+        {
+          id: 'global-ec-stack',
+          type: 'stackFrameNode',
+          data: { label: 'Global EC' },
+          position: { x: 100, y: 120 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'counter-ec-stack',
+          type: 'stackFrameNode',
+          data: { 
+            label: 'Counter Function EC',
+            highlighted: true 
+          },
+          position: { x: 100, y: 180 },
+          parentNode: 'call-stack',
+          extent: 'parent',
+        },
+        {
+          id: 'global-ec',
+          type: 'executionContextNode',
+          data: { label: 'Global Execution Context' },
+          position: { x: 250, y: 50 },
+        },
+        {
+          id: 'counter-ec',
+          type: 'executionContextNode',
+          data: { 
+            label: 'Counter Function Execution Context',
+            highlighted: true 
+          },
+          position: { x: 450, y: 50 },
+        },
+        {
+          id: 'global-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Global Scope',
+            type: 'global'
+          },
+          position: { x: 250, y: 150 },
+        },
+        {
+          id: 'counter-scope',
+          type: 'scopeNode',
+          data: { 
+            label: 'Counter Function Scope',
+            type: 'function',
+            highlighted: true 
+          },
+          position: { x: 450, y: 150 },
+        },
+        {
+          id: 'createCounter',
+          type: 'functionNode',
+          data: { 
+            label: 'createCounter',
+            description: 'Function definition'
+          },
+          position: { x: 200, y: 220 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'counter-var',
+          type: 'variableNode',
+          data: { 
+            label: 'counter', 
+            value: 'function()'
+          },
+          position: { x: 350, y: 220 },
+          parentNode: 'global-scope',
+          extent: 'parent',
+        },
+        {
+          id: 'memory-heap',
+          type: 'heapObjectNode',
+          data: { label: 'Memory Heap' },
+          position: { x: 650, y: 150 },
+        },
+        {
+          id: 'function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Function Object', 
+            value: 'createCounter'
+          },
+          position: { x: 600, y: 220 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'inner-function-def',
+          type: 'heapObjectNode',
+          data: { 
+            label: 'Inner Function Object', 
+            value: 'anonymous'
+          },
+          position: { x: 600, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'closure-env',
+          type: 'scopeNode',
+          data: { 
+            label: 'Closure Environment',
+            type: 'function'
+          },
+          position: { x: 700, y: 300 },
+          parentNode: 'memory-heap',
+          extent: 'parent',
+        },
+        {
+          id: 'count-var-closure',
+          type: 'variableNode',
+          data: { 
+            label: 'count', 
+            value: '2',
+            highlighted: true
+          },
+          position: { x: 700, y: 380 },
+          parentNode: 'closure-env',
+          extent: 'parent',
+        },
+      ],
+      edges: [
+        {
+          id: 'function-to-def',
+          source: 'createCounter',
+          target: 'function-def',
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'counter-to-inner',
+          source: 'counter-var',
+          target: 'inner-function-def',
+          markerEnd: { type: MarkerType.Arrow },
+        },
+        {
+          id: 'inner-to-closure',
+          source: 'inner-function-def',
+          target: 'closure-env',
+          style: { stroke: '#7E69AB', strokeWidth: 2 },
+          markerEnd: { type: MarkerType.Arrow },
+          label: 'closure',
+        },
+        {
+          id: 'counter-ec-to-closure',
+          source: 'counter-ec',
+          target: 'count-var-closure',
+          animated: true,
+          style: { stroke: '#9b87f5', strokeWidth: 2, strokeDasharray: '5 5' },
+          markerEnd: { type: MarkerType.Arrow },
+          label: 'access & update',
+        },
+      ],
+    }
+  ],
+};
 
 // Basic function example
 const functionScopeExample: CodeExample = {
@@ -200,10 +903,7 @@ console.log(globalVar);
         {
           id: 'function-ec-stack',
           type: 'stackFrameNode',
-          data: { 
-            label: 'exampleFunction EC',
-            highlighted: true 
-          },
+          data: { label: 'exampleFunction EC' },
           position: { x: 100, y: 220 },
           parentNode: 'call-stack',
           extent: 'parent',
@@ -584,8 +1284,7 @@ console.log(globalVar);
           type: 'heapObjectNode',
           data: { 
             label: 'String', 
-            value: '"I\'m global"',
-            highlighted: true
+            value: '"I\'m global"'
           },
           position: { x: 650, y: 220 },
           parentNode: 'memory-heap',
@@ -779,8 +1478,7 @@ console.log(globalVar);
           type: 'heapObjectNode',
           data: { 
             label: 'String', 
-            value: '"I\'m in a function"',
-            highlighted: true
+            value: '"I\'m in a function"'
           },
           position: { x: 650, y: 380 },
           parentNode: 'memory-heap',
@@ -804,7 +1502,6 @@ console.log(globalVar);
           id: 'functionVar-to-string',
           source: 'functionVar',
           target: 'string-function',
-          animated: true,
           markerEnd: { type: MarkerType.Arrow },
         },
         {
@@ -1173,8 +1870,8 @@ exampleFunction();`,
 
 // Add more examples like closures, lexical scope, etc.
 const examples: CodeExample[] = [
+  closureExample,
   functionScopeExample,
-  // Add more examples here
 ];
 
 export default examples;
