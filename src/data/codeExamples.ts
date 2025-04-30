@@ -1,6 +1,6 @@
 
 import { CodeExample } from '@/types';
-import { MarkerType } from '@xyflow/react';
+import { MarkerType } from 'reactflow';
 
 // Basic function example
 const functionScopeExample: CodeExample = {

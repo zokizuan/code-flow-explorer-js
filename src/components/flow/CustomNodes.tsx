@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position } from 'reactflow';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +16,7 @@ type BaseNodeProps = {
     value?: string;
     description?: string;
     highlighted?: boolean;
+    type?: string;
   };
   className?: string;
   targetPosition?: Position;

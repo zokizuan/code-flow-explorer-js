@@ -6,7 +6,7 @@ import {
   Controls,
   MiniMap,
   useReactFlow,
-} from '@xyflow/react';
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 import { ExecutionStep } from '@/types';
 import { nodeTypes } from './CustomNodes';

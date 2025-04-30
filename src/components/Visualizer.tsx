@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ReactFlowProvider } from '@xyflow/react';
+import { ReactFlowProvider } from 'reactflow';
 import { motion } from 'framer-motion';
 
 import CodeEditor from './CodeEditor';
