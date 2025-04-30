@@ -7,9 +7,10 @@ import {
   MiniMap,
   useReactFlow,
   Panel,
+  NodeProps,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { ExecutionStep } from '@/types';
+import { ExecutionStep, FlowNodeData } from '@/types';
 import { nodeTypes } from './CustomNodes';
 import { motion } from 'framer-motion';
 
@@ -105,7 +106,9 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
           data: {
             ...node.data,
             column: column.id
-          }
+          },
+          // Ensure extent is correctly typed if it exists
+          ...(node.extent ? { extent: node.extent as 'parent' } : {})
         });
       });
     });
@@ -128,7 +131,7 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
     <div className={className}>
       <ReactFlow
         nodes={organizedNodes}
-        edges={[]} // Simplified: no edges in Kanban view for cleaner UI
+        edges={step.edges} // Use actual edges from the step
         nodeTypes={nodeTypes}
         fitView
         minZoom={0.5}

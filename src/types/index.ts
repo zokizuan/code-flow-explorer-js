@@ -1,6 +1,15 @@
 
 import { Node, Edge } from 'reactflow';
 
+export type FlowNodeData = {
+  label: string;
+  value?: string;
+  description?: string;
+  highlighted?: boolean;
+  type?: string;
+  column?: string;
+};
+
 export type ExecutionStep = {
   id: string;
   code: string;
@@ -16,13 +25,4 @@ export type CodeExample = {
   description: string;
   code: string;
   steps: ExecutionStep[];
-};
-
-export type FlowNodeData = {
-  label: string;
-  value?: string;
-  description?: string;
-  highlighted?: boolean;
-  type?: string;
-  column?: string;
 };

@@ -107,7 +107,7 @@ counter(); // Second call, count becomes 2`,
           },
           position: { x: 600, y: 150 },
           parentNode: 'global-scope',
-          extent: 'parent'
+          extent: 'parent' // Fixed: Use literal 'parent' instead of a string
         },
         {
           id: 'memory-heap',
@@ -127,7 +127,7 @@ counter(); // Second call, count becomes 2`,
           },
           position: { x: 850, y: 150 },
           parentNode: 'memory-heap',
-          extent: 'parent'
+          extent: 'parent' // Fixed: Use literal 'parent' instead of a string
         }
       ],
       edges: [
