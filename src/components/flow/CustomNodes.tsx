@@ -17,6 +17,7 @@ type BaseNodeProps = {
     description?: string;
     highlighted?: boolean;
     type?: string;
+    column?: string;
   };
   className?: string;
   targetPosition?: Position;
@@ -27,8 +28,8 @@ type BaseNodeProps = {
 const BaseNode: React.FC<BaseNodeProps> = ({
   data,
   className,
-  targetPosition = Position.Top,
-  sourcePosition = Position.Bottom,
+  targetPosition = Position.Left,
+  sourcePosition = Position.Right,
   children,
 }) => {
   return (
@@ -36,7 +37,7 @@ const BaseNode: React.FC<BaseNodeProps> = ({
       initial="hidden"
       animate={data.highlighted ? "highlight" : "visible"}
       variants={nodeVariants}
-      className={cn("p-3 rounded-lg min-w-[150px] border bg-white shadow-md", className)}
+      className={cn("p-3 rounded-lg w-full max-w-[200px] border bg-white shadow-md", className)}
     >
       {targetPosition !== null && <Handle type="target" position={targetPosition} className="!bg-gray-500" />}
       

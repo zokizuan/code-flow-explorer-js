@@ -6,6 +6,7 @@ import {
   Controls,
   MiniMap,
   useReactFlow,
+  Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { ExecutionStep } from '@/types';
@@ -17,70 +18,99 @@ type ExecutionFlowProps = {
   className?: string;
 };
 
-// Define column categories to better organize the visualization
-const LAYOUT_COLUMNS = {
-  CALLSTACK: { x: 150, width: 150, label: 'Call Stack' },
-  EXECUTION_CONTEXTS: { x: 350, width: 200, label: 'Execution Contexts' },
-  SCOPES: { x: 600, width: 200, label: 'Scopes' },
-  MEMORY: { x: 850, width: 250, label: 'Memory Heap' }
+// Define column categories for the kanban layout
+const KANBAN_COLUMNS = [
+  { id: 'call-stack', label: 'Call Stack', color: 'bg-blue-100' },
+  { id: 'execution-contexts', label: 'Execution Contexts', color: 'bg-purple-100' },
+  { id: 'scopes', label: 'Scopes', color: 'bg-green-100' },
+  { id: 'memory-heap', label: 'Memory Heap', color: 'bg-amber-100' }
+];
+
+// Helper function to determine which column a node belongs to
+const getNodeColumn = (node: any) => {
+  if (node.type === 'stackFrameNode' || node.id.includes('call-stack')) {
+    return 'call-stack';
+  } else if (node.type === 'executionContextNode') {
+    return 'execution-contexts';
+  } else if (node.type === 'scopeNode') {
+    return 'scopes';
+  } else if (node.type === 'heapObjectNode' || node.id.includes('heap')) {
+    return 'memory-heap';
+  }
+  
+  // Default to execution-contexts if no match
+  return 'execution-contexts';
 };
 
 const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
   const { fitView } = useReactFlow();
 
-  // Apply layout categorization to nodes
+  // Organize nodes into kanban columns
   const organizedNodes = useMemo(() => {
-    const columnYPositions = {
-      [LAYOUT_COLUMNS.CALLSTACK.label]: 100,
-      [LAYOUT_COLUMNS.EXECUTION_CONTEXTS.label]: 100,
-      [LAYOUT_COLUMNS.SCOPES.label]: 100,
-      [LAYOUT_COLUMNS.MEMORY.label]: 100
-    };
+    // Calculate column widths based on container
+    const containerWidth = 1200; // Estimate, will be adjusted by fitView
+    const columnWidth = containerWidth / KANBAN_COLUMNS.length;
+    const columnPadding = 50;
     
-    // First pass to position parent nodes
-    const parentNodes = step.nodes.filter(node => !node.parentNode);
-    
-    // Don't modify nodes from examples directly, create a new array
-    return step.nodes.map(node => {
-      const newNode = { ...node };
-      
-      // Skip nodes that already have parents
-      if (node.parentNode) {
-        return newNode;
-      }
-      
-      // Set positions based on node types for better categorization
-      if (node.type === 'stackFrameNode' || node.id.includes('call-stack')) {
-        newNode.position = { 
-          x: LAYOUT_COLUMNS.CALLSTACK.x, 
-          y: columnYPositions[LAYOUT_COLUMNS.CALLSTACK.label]
-        };
-        columnYPositions[LAYOUT_COLUMNS.CALLSTACK.label] += 100;
-      } 
-      else if (node.type === 'executionContextNode') {
-        newNode.position = { 
-          x: LAYOUT_COLUMNS.EXECUTION_CONTEXTS.x, 
-          y: columnYPositions[LAYOUT_COLUMNS.EXECUTION_CONTEXTS.label]
-        };
-        columnYPositions[LAYOUT_COLUMNS.EXECUTION_CONTEXTS.label] += 100;
-      }
-      else if (node.type === 'scopeNode') {
-        newNode.position = { 
-          x: LAYOUT_COLUMNS.SCOPES.x, 
-          y: columnYPositions[LAYOUT_COLUMNS.SCOPES.label]
-        };
-        columnYPositions[LAYOUT_COLUMNS.SCOPES.label] += 100;
-      }
-      else if (node.type === 'heapObjectNode' || node.id.includes('heap')) {
-        newNode.position = { 
-          x: LAYOUT_COLUMNS.MEMORY.x, 
-          y: columnYPositions[LAYOUT_COLUMNS.MEMORY.label]
-        };
-        columnYPositions[LAYOUT_COLUMNS.MEMORY.label] += 100;
-      }
-      
-      return newNode;
+    // Group nodes by column
+    const columnNodes: Record<string, any[]> = {};
+    KANBAN_COLUMNS.forEach(col => {
+      columnNodes[col.id] = [];
     });
+    
+    step.nodes.forEach(node => {
+      const columnId = getNodeColumn(node);
+      columnNodes[columnId].push({ ...node });
+    });
+    
+    // Position nodes within their columns
+    const positionedNodes = [];
+    
+    KANBAN_COLUMNS.forEach((column, colIndex) => {
+      const nodes = columnNodes[column.id];
+      
+      // Add column header node
+      positionedNodes.push({
+        id: `column-header-${column.id}`,
+        type: 'group',
+        position: { 
+          x: colIndex * columnWidth + columnPadding / 2, 
+          y: 20 
+        },
+        style: {
+          width: columnWidth - columnPadding,
+          height: 40,
+          backgroundColor: column.color.replace('bg-', '#'),
+          opacity: 0.7,
+          borderRadius: '8px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          zIndex: 0,
+        },
+        data: { label: column.label },
+      });
+      
+      // Position actual nodes
+      nodes.forEach((node, nodeIndex) => {
+        const x = colIndex * columnWidth + columnPadding;
+        const y = 80 + nodeIndex * 120;
+        
+        positionedNodes.push({
+          ...node,
+          position: { x, y },
+          // Add column info to the node data for potential styling
+          data: {
+            ...node.data,
+            column: column.id
+          }
+        });
+      });
+    });
+    
+    return positionedNodes;
   }, [step.nodes]);
 
   // Use effect to fit view whenever the step changes
@@ -90,26 +120,24 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
     }, 50);
   }, [step.id, fitView]);
 
+  const handlePaneClick = useCallback(() => {
+    // Provide a handler so users can click anywhere to interact
+  }, []);
+
   return (
     <div className={className}>
-      <div className="absolute top-2 left-2 right-2 bg-white/90 backdrop-blur-sm p-2 rounded-lg border shadow-sm z-10">
-        <div className="flex flex-wrap gap-2 justify-center">
-          <span className="bg-blue-100 px-3 py-1 rounded text-xs font-medium">{LAYOUT_COLUMNS.CALLSTACK.label}</span>
-          <span className="bg-purple-100 px-3 py-1 rounded text-xs font-medium">{LAYOUT_COLUMNS.EXECUTION_CONTEXTS.label}</span>
-          <span className="bg-green-100 px-3 py-1 rounded text-xs font-medium">{LAYOUT_COLUMNS.SCOPES.label}</span>
-          <span className="bg-amber-100 px-3 py-1 rounded text-xs font-medium">{LAYOUT_COLUMNS.MEMORY.label}</span>
-        </div>
-      </div>
-      
       <ReactFlow
         nodes={organizedNodes}
-        edges={step.edges}
+        edges={[]} // Simplified: no edges in Kanban view for cleaner UI
         nodeTypes={nodeTypes}
         fitView
         minZoom={0.5}
         maxZoom={2}
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
         attributionPosition="bottom-right"
+        onPaneClick={handlePaneClick}
+        elementsSelectable={true}
+        nodesDraggable={false}
       >
         <Background color="#f8f8fc" gap={16} />
         <Controls />

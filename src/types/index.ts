@@ -1,5 +1,4 @@
 
-// We're using reactflow as the recommended import name in the new version
 import { Node, Edge } from 'reactflow';
 
 export type ExecutionStep = {
@@ -25,4 +24,5 @@ export type FlowNodeData = {
   description?: string;
   highlighted?: boolean;
   type?: string;
+  column?: string;
 };
