@@ -36,14 +36,14 @@ const BaseNode: React.FC<BaseNodeProps> = ({
       initial="hidden"
       animate={data.highlighted ? "highlight" : "visible"}
       variants={nodeVariants}
-      className={cn("p-3 rounded-lg min-w-[100px] border bg-white shadow-md", className)}
+      className={cn("p-3 rounded-lg min-w-[150px] border bg-white shadow-md", className)}
     >
-      {targetPosition !== null && <Handle type="target" position={targetPosition} />}
+      {targetPosition !== null && <Handle type="target" position={targetPosition} className="!bg-gray-500" />}
       
       <div className="font-medium mb-1">{data.label}</div>
       
       {data.value && (
-        <div className="text-sm bg-gray-50 p-1 rounded border mt-1">
+        <div className="text-sm bg-gray-50 p-1.5 rounded border mt-1 font-mono">
           {data.value}
         </div>
       )}
@@ -54,7 +54,7 @@ const BaseNode: React.FC<BaseNodeProps> = ({
       
       {children}
       
-      {sourcePosition !== null && <Handle type="source" position={sourcePosition} />}
+      {sourcePosition !== null && <Handle type="source" position={sourcePosition} className="!bg-gray-500" />}
     </motion.div>
   );
 };
