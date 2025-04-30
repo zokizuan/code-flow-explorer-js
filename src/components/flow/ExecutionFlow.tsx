@@ -13,29 +13,30 @@ import 'reactflow/dist/style.css';
 import { ExecutionStep, FlowNodeData } from '@/types';
 import { nodeTypes } from './CustomNodes';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 type ExecutionFlowProps = {
   step: ExecutionStep;
   className?: string;
 };
 
-// Define column categories for the kanban layout
+// Define column categories for the kanban layout - inspired by the provided screenshots
 const KANBAN_COLUMNS = [
-  { id: 'call-stack', label: 'Call Stack', color: 'bg-blue-100' },
-  { id: 'execution-contexts', label: 'Execution Contexts', color: 'bg-purple-100' },
-  { id: 'scopes', label: 'Scopes', color: 'bg-green-100' },
-  { id: 'memory-heap', label: 'Memory Heap', color: 'bg-amber-100' }
+  { id: 'call-stack', label: 'Call Stack', color: 'bg-blue-100', borderColor: 'border-blue-400' },
+  { id: 'execution-contexts', label: 'Execution Contexts', color: 'bg-purple-100', borderColor: 'border-purple-400' },
+  { id: 'lexical-environment', label: 'Lexical Environment', color: 'bg-green-100', borderColor: 'border-green-400' },
+  { id: 'memory-heap', label: 'Memory Heap', color: 'bg-amber-100', borderColor: 'border-amber-400' }
 ];
 
 // Helper function to determine which column a node belongs to
 const getNodeColumn = (node: any) => {
-  if (node.type === 'stackFrameNode' || node.id.includes('call-stack')) {
+  if (node.type === 'stackFrameNode' || node.id.includes('stack')) {
     return 'call-stack';
-  } else if (node.type === 'executionContextNode') {
+  } else if (node.type === 'executionContextNode' || node.id.includes('ec')) {
     return 'execution-contexts';
-  } else if (node.type === 'scopeNode') {
-    return 'scopes';
-  } else if (node.type === 'heapObjectNode' || node.id.includes('heap')) {
+  } else if (node.type === 'scopeNode' || node.type === 'environmentRecordNode' || node.id.includes('scope') || node.id.includes('env')) {
+    return 'lexical-environment';
+  } else if (node.type === 'heapObjectNode' || node.id.includes('heap') || node.id.includes('object')) {
     return 'memory-heap';
   }
   
@@ -81,8 +82,9 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
         style: {
           width: columnWidth - columnPadding,
           height: 40,
-          backgroundColor: column.color.replace('bg-', '#'),
-          opacity: 0.7,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          border: '2px solid',
+          borderColor: column.borderColor.replace('border-', ''),
           borderRadius: '8px',
           display: 'flex',
           justifyContent: 'center',
@@ -94,7 +96,7 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
         data: { label: column.label },
       });
       
-      // Position actual nodes
+      // Position actual nodes with better spacing, inspired by the provided images
       nodes.forEach((node, nodeIndex) => {
         const x = colIndex * columnWidth + columnPadding;
         const y = 80 + nodeIndex * 120;
@@ -108,7 +110,7 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
             column: column.id
           },
           // Ensure extent is correctly typed if it exists
-          ...(node.extent ? { extent: node.extent as 'parent' } : {})
+          ...(node.extent ? { extent: 'parent' } : {})
         });
       });
     });
@@ -123,26 +125,35 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
     }, 50);
   }, [step.id, fitView]);
 
-  const handlePaneClick = useCallback(() => {
-    // Provide a handler so users can click anywhere to interact
-  }, []);
+  // Filter edges to only show the most important connections, to reduce visual clutter
+  const simplifiedEdges = useMemo(() => {
+    // Only show edges that are highlighted or connect nodes with a close relationship
+    return step.edges.map(edge => ({
+      ...edge,
+      animated: edge.id.includes('closure') || edge.id.includes('updates') || edge.animated,
+      style: {
+        ...edge.style,
+        strokeWidth: edge.id.includes('closure') ? 2 : 1,
+        opacity: 0.7,
+      }
+    }));
+  }, [step.edges]);
 
   return (
     <div className={className}>
       <ReactFlow
         nodes={organizedNodes}
-        edges={step.edges} // Use actual edges from the step
+        edges={simplifiedEdges} 
         nodeTypes={nodeTypes}
         fitView
         minZoom={0.5}
         maxZoom={2}
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
         attributionPosition="bottom-right"
-        onPaneClick={handlePaneClick}
-        elementsSelectable={true}
         nodesDraggable={false}
+        elementsSelectable={true}
       >
-        <Background color="#f8f8fc" gap={16} />
+        <Background color="#f8fafc" gap={16} />
         <Controls />
         <MiniMap 
           nodeStrokeWidth={3} 
@@ -150,6 +161,10 @@ const ExecutionFlow: React.FC<ExecutionFlowProps> = ({ step, className }) => {
           pannable 
           nodeBorderRadius={2}
         />
+        
+        <Panel position="top-center" className="bg-white/80 backdrop-blur-sm rounded px-3 py-1 text-sm border shadow-sm">
+          JavaScript Runtime Visualization
+        </Panel>
       </ReactFlow>
       
       <motion.div 

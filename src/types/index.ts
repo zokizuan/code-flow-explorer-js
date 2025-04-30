@@ -15,7 +15,7 @@ export type ExecutionStep = {
   code: string;
   activeLine: number;
   description: string;
-  nodes: Node[];
+  nodes: Node<FlowNodeData>[];
   edges: Edge[];
 };
 

@@ -37,7 +37,7 @@ const BaseNode: React.FC<BaseNodeProps> = ({
       initial="hidden"
       animate={data.highlighted ? "highlight" : "visible"}
       variants={nodeVariants}
-      className={cn("p-3 rounded-lg w-full max-w-[200px] border bg-white shadow-md", className)}
+      className={cn("p-3 rounded-lg w-full max-w-[200px] border shadow-md", className)}
     >
       {targetPosition !== null && <Handle type="target" position={targetPosition} className="!bg-gray-500" />}
       
@@ -60,6 +60,7 @@ const BaseNode: React.FC<BaseNodeProps> = ({
   );
 };
 
+// Function Node with purple styling
 export const FunctionNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
@@ -69,6 +70,7 @@ export const FunctionNode: React.FC<BaseNodeProps> = (props) => {
   );
 };
 
+// Variable Node with blue styling
 export const VariableNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
@@ -78,6 +80,7 @@ export const VariableNode: React.FC<BaseNodeProps> = (props) => {
   );
 };
 
+// Scope Node with green styling for different scope types
 export const ScopeNode: React.FC<BaseNodeProps> = (props) => {
   const { data } = props;
   const scopeType = data.type || 'global';
@@ -102,6 +105,7 @@ export const ScopeNode: React.FC<BaseNodeProps> = (props) => {
   );
 };
 
+// Execution Context Node with deeper purple styling
 export const ExecutionContextNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
@@ -111,20 +115,43 @@ export const ExecutionContextNode: React.FC<BaseNodeProps> = (props) => {
   );
 };
 
+// Stack Frame Node with blue styling
 export const StackFrameNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
-      className="border-blue-500 bg-blue-100"
+      className="border-blue-500 bg-blue-100 text-blue-800"
     />
   );
 };
 
+// Heap Object Node with amber styling
 export const HeapObjectNode: React.FC<BaseNodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
       className="border-amber-400 bg-amber-50"
+    />
+  );
+};
+
+// Environment Record Node similar to your example
+export const EnvironmentRecordNode: React.FC<BaseNodeProps> = (props) => {
+  const { data } = props;
+  const isOuter = data.label.toLowerCase().includes('outer');
+  const isGlobal = data.label.toLowerCase().includes('global');
+  
+  let className = "border-cyan-400 bg-cyan-50";
+  if (isOuter) {
+    className = "border-green-500 bg-green-50";
+  } else if (isGlobal) {
+    className = "border-blue-400 bg-blue-50";
+  }
+  
+  return (
+    <BaseNode
+      {...props}
+      className={className}
     />
   );
 };
@@ -136,4 +163,5 @@ export const nodeTypes = {
   executionContextNode: ExecutionContextNode,
   stackFrameNode: StackFrameNode,
   heapObjectNode: HeapObjectNode,
+  environmentRecordNode: EnvironmentRecordNode,
 };
